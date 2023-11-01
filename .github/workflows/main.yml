@@ -14,8 +14,8 @@ jobs:
           sudo sysadminctl -addUser runneradmin -password "Rabiu2004@" -home /Users/runneradmin -admin
         shell: bash
 
-      - name: Install TightVNC
-        run: brew install tightvnc
+      - name: Install TigerVNC
+        run: brew install tiger-vnc
         shell: bash
 
       - name: Start VNC Server
