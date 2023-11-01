@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-  workflow_dispatch:
+    workflow_dispatch:
 
 jobs:
   build:
@@ -14,15 +14,12 @@ jobs:
           sudo sysadminctl -addUser runneradmin -password "Rabiu2004@" -home /Users/runneradmin -admin
         shell: bash
 
-      - name: Install TigerVNC
-        run: brew install tiger-vnc
+      - name: Enable SSH access
+        run: sudo systemsetup -setremotelogin on
         shell: bash
 
-      - name: Start VNC Server
-        run: |
-          vncserver -localhost no :1
-          echo "Rabiu2004@" | vncpasswd -f > ~/.vnc/passwd
-          chmod 600 ~/.vnc/passwd
+      - name: Start SSH Service
+        run: sudo launchctl load /System/Library/LaunchDaemons/ssh.plist
         shell: bash
 
       - name: Download ngrok
@@ -37,10 +34,6 @@ jobs:
         run: ./ngrok authtoken 2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa
         shell: bash
 
-      - name: Enable SSH access
-        run: sudo systemsetup -setremotelogin on
-        shell: bash
-
-      - name: Create Tunnel
-        run: ./ngrok tcp 5901
+      - name: Create SSH Tunnel
+        run: ./ngrok tcp 22
         shell: bash
