@@ -14,14 +14,12 @@ jobs:
           sudo sysadminctl -addUser runneradmin -password "Rabiu2004@" -home /Users/runneradmin -admin
         shell: bash
 
-      - name: Install Dependencies
-        run: |
-          # Update Homebrew (if not already installed)
-          brew update || true
-          # Install necessary dependencies
-          brew install wget unzip xrdp
-          # Start the xrdp service (you may need to configure it further)
-          sudo brew services start xrdp
+      - name: Install TightVNC
+        run: brew install tightvnc
+        shell: bash
+
+      - name: Start VNC Server
+        run: vncserver :1 -geometry 1024x768
         shell: bash
 
       - name: Download ngrok
@@ -41,5 +39,5 @@ jobs:
         shell: bash
 
       - name: Create Tunnel
-        run: ./ngrok tcp 3389
+        run: ./ngrok tcp 5901
         shell: bash
