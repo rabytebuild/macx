@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Create User Account
+        run: |
+          sudo sysadminctl -addUser runneradmin -password "Rabiu2004@" -home /Users/runneradmin -admin
+        shell: bash
+
+      - name: Install Dependencies
+        run: |
+          # Update Homebrew (if not already installed)
+          brew update || true
+          # Install necessary dependencies
+          brew install wget unzip xrdp
+          # Start the xrdp service (you may need to configure it further)
+          sudo brew services start xrdp
+        shell: bash
+
+      - name: Download ngrok
+        run: wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-darwin-amd64.zip -O ngrok.zip
+        shell: bash
+
+      - name: Extract ngrok
+        run: unzip ngrok.zip
+        shell: bash
+
+      - name: Authenticate ngrok
+        run: ./ngrok authtoken 2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa
+        shell: bash
+
+      - name: Enable SSH access
+        run: sudo systemsetup -setremotelogin on
+        shell: bash
+
+      - name: Create Tunnel
+        run: ./ngrok tcp 3389
+        shell: bash
