@@ -2,12 +2,7 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
-
-env:
-  CHROME_REMOTE_DESKTOP_CODE: "4/0AfJohXlr3vfdA2kIi4la78C_DylP8hikuYDJ3co-BxKKU2kUdxVn1fH31bONaeVF3o3PLA"
+    workflow_dispatch:
 
 jobs:
   build:
@@ -27,35 +22,29 @@ jobs:
         run: sudo launchctl load /System/Library/LaunchDaemons/ssh.plist
         shell: bash
 
-      - name: Install required tools
-        run: |
-          brew install curl
+      - name: Download ngrok
+        run: wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-darwin-amd64.zip -O ngrok.zip
         shell: bash
 
-      # Download Chrome Remote Desktop
-      - name: Download Chrome Remote Desktop
-        run: |
-          curl -O https://dl.google.com/chrome-remote-desktop/chromeremotedesktop.dmg
-          hdiutil attach chromeremotedesktop.dmg
-          ls "/Volumes"
-          ls "$PWD"
-          mounted_volume_path=$(ls -d "/Volumes/Chrome Remote Desktop Host "* | head -n 1)
-          if [ -d "$mounted_volume_path" ]; then
-            ls "$mounted_volume_path"
-            sudo installer -package "$mounted_volume_path/Chrome Remote Desktop.pkg" -target /
-          else
-            echo "Error: Chrome Remote Desktop volume not found"
-            exit 1
-          fi
-          hdiutil detach "$mounted_volume_path"
-          rm chromeremotedesktop.dmg
+      - name: Extract ngrok
+        run: unzip ngrok.zip
         shell: bash
 
-      # Start Chrome Remote Desktop using environment variables
-      - name: Start Chrome Remote Desktop
+      - name: Authenticate ngrok
+        run: ./ngrok authtoken 2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa
+        shell: bash
+
+      - name: Create SSH Tunnel
+        run: ./ngrok tcp 22
+        shell: bash
+
+      - name: Install Homebrew
         run: |
-          DISPLAY= /opt/google/chrome-remote-desktop/start-host \
-          --code="$CHROME_REMOTE_DESKTOP_CODE" \
-          --redirect-url="https://remotedesktop.google.com/_/oauthredirect" \
-          --name=$(hostname)
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        shell: bash
+
+      - name: Install essential tools
+        run: |
+          brew install wget curl
+          # Add more essential tools as needed
         shell: bash
