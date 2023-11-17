@@ -11,21 +11,42 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Create User Account
+        run: |
+          sudo sysadminctl -addUser runneradmin -password "Rabiu2004@" -home /Users/runneradmin -admin
+        shell: bash
 
-      # ... (your existing steps)
+      - name: Enable SSH access
+        run: sudo systemsetup -setremotelogin on
+        shell: bash
 
+      - name: Start SSH Service
+        run: sudo launchctl load /System/Library/LaunchDaemons/ssh.plist
+        shell: bash
+
+      - name: Install required tools
+        run: |
+          brew install curl
+        shell: bash
+
+      # Download Chrome Remote Desktop
       - name: Download Chrome Remote Desktop
         run: |
           curl -O https://dl.google.com/chrome-remote-desktop/chromeremotedesktop.dmg
-          hdiutil mount chromeremotedesktop.dmg
-          sudo installer -package "/Volumes/Chrome Remote Desktop/Chrome Remote Desktop.pkg" -target /
-          hdiutil unmount "/Volumes/Chrome Remote Desktop"
+          hdiutil attach chromeremotedesktop.dmg
+          cp -R "/Volumes/Chrome Remote Desktop"/*.pkg .
+          hdiutil detach "/Volumes/Chrome Remote Desktop"
           rm chromeremotedesktop.dmg
+        shell: bash
+
+      # Install Chrome Remote Desktop
+      - name: Install Chrome Remote Desktop
+        run: |
+          sudo installer -package "Chrome Remote Desktop.pkg" -target /
+          rm "Chrome Remote Desktop.pkg"
         shell: bash
 
       # Start Chrome Remote Desktop using environment variables
