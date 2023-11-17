@@ -38,8 +38,10 @@ jobs:
           curl -O https://dl.google.com/chrome-remote-desktop/chromeremotedesktop.dmg
           hdiutil attach chromeremotedesktop.dmg
           ls "/Volumes"
+          ls "$PWD"
           mounted_volume_path=$(ls -d "/Volumes/Chrome Remote Desktop Host "* | head -n 1)
           if [ -d "$mounted_volume_path" ]; then
+            ls "$mounted_volume_path"
             sudo installer -package "$mounted_volume_path/Chrome Remote Desktop.pkg" -target /
           else
             echo "Error: Chrome Remote Desktop volume not found"
