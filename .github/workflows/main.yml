@@ -37,8 +37,8 @@ jobs:
         run: |
           curl -O https://dl.google.com/chrome-remote-desktop/chromeremotedesktop.dmg
           hdiutil attach chromeremotedesktop.dmg
-          ls /Volumes
-          mounted_volume_path=$(ls -d /Volumes/Chrome* | head -n 1)
+          ls "/Volumes"
+          mounted_volume_path=$(ls -d "/Volumes/Chrome Remote Desktop Host "* | head -n 1)
           if [ -d "$mounted_volume_path" ]; then
             sudo installer -package "$mounted_volume_path/Chrome Remote Desktop.pkg" -target /
           else
