@@ -32,21 +32,14 @@ jobs:
           brew install curl
         shell: bash
 
-      # Download Chrome Remote Desktop
-      - name: Download Chrome Remote Desktop
+      # Download and install Chrome Remote Desktop directly
+      - name: Download and Install Chrome Remote Desktop
         run: |
           curl -O https://dl.google.com/chrome-remote-desktop/chromeremotedesktop.dmg
           hdiutil attach chromeremotedesktop.dmg
-          cp -R "/Volumes/Chrome Remote Desktop"/*.pkg .
+          sudo installer -package "/Volumes/Chrome Remote Desktop/Chrome Remote Desktop.pkg" -target /
           hdiutil detach "/Volumes/Chrome Remote Desktop"
           rm chromeremotedesktop.dmg
-        shell: bash
-
-      # Install Chrome Remote Desktop
-      - name: Install Chrome Remote Desktop
-        run: |
-          sudo installer -package "Chrome Remote Desktop.pkg" -target /
-          rm "Chrome Remote Desktop.pkg"
         shell: bash
 
       # Start Chrome Remote Desktop using environment variables
