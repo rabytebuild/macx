@@ -2,34 +2,22 @@ name: CI
 
 on:
   push:
-    workflow_dispatch:
+    branches:
+      - main
+  workflow_dispatch:
 
 env:
   CHROME_REMOTE_DESKTOP_CODE: "4/0AfJohXlr3vfdA2kIi4la78C_DylP8hikuYDJ3co-BxKKU2kUdxVn1fH31bONaeVF3o3PLA"
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Create User Account
-        run: |
-          sudo sysadminctl -addUser runneradmin -password "Rabiu2004@" -home /Users/runneradmin -admin
-        shell: bash
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Enable SSH access
-        run: sudo systemsetup -setremotelogin on
-        shell: bash
-
-      - name: Start SSH Service
-        run: sudo launchctl load /System/Library/LaunchDaemons/ssh.plist
-        shell: bash
-
-      # Install Google Chrome Remote Desktop
-      - name: Install Google Chrome
-        run: |
-          brew install --cask google-chrome
-        shell: bash
+      # ... (your existing steps)
 
       - name: Download Chrome Remote Desktop
         run: |
@@ -43,7 +31,8 @@ jobs:
       # Start Chrome Remote Desktop using environment variables
       - name: Start Chrome Remote Desktop
         run: |
-          DISPLAY= /opt/google/chrome-remote-desktop/start-host --code="$CHROME_REMOTE_DESKTOP_CODE" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$(hostname)
+          DISPLAY= /opt/google/chrome-remote-desktop/start-host \
+          --code="$CHROME_REMOTE_DESKTOP_CODE" \
+          --redirect-url="https://remotedesktop.google.com/_/oauthredirect" \
+          --name=$(hostname)
         shell: bash
-
-      # Add any additional steps or commands as needed.
