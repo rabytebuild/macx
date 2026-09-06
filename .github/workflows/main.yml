@@ -31,7 +31,7 @@ jobs:
         shell: bash
 
       - name: Authenticate ngrok
-        run: ./ngrok authtoken 2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa
+        run: ./ngrok authtoken 2jjqJ8mTlps4zo2wDNnREY5Xups_5BJT4C1zFSDQcyGQYqg1b
         shell: bash
 
       - name: Create SSH Tunnel
