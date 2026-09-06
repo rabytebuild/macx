@@ -35,7 +35,7 @@ jobs:
         shell: bash
 
       - name: Start ngrok Tunnel (Background)
-        run: nohup ./ngrok tcp 22 > /dev/null 2>&1 &
+        run: nohup ngrok tcp 22 > /dev/null 2>&1 &
         shell: bash
 
       - name: Install Homebrew
