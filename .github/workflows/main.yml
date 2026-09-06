@@ -1,4 +1,4 @@
-name: Runtime
+name: CI
 
 on:
   push:
@@ -11,21 +11,19 @@ jobs:
     steps:
       - name: Create User Account with Home Directory
         run: |
-          sudo sysadminctl -addUser rhsalisu -password "R@b1u2004@" -admin
-          sudo mkdir -p /Users/rhsalisu
-          sudo chown -R rhsalisu:staff /Users/rhsalisu
-          sudo chmod 700 /Users/rhsalisu
-          sudo dseditgroup -o edit -a rhsalisu -t user admin || true
-          echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' | sudo tee /Users/rhsalisu/.zprofile > /dev/null
-          echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' | sudo tee /Users/rhsalisu/.bash_profile > /dev/null
+          sudo sysadminctl -addUser runneradmin -password "Rabiu2004@" -admin
+          sudo mkdir -p /Users/runneradmin
+          sudo chown -R runneradmin:staff /Users/runneradmin
+          sudo chmod 700 /Users/runneradmin
+          sudo dseditgroup -o edit -a runneradmin -t user admin || true
+          echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' | sudo tee /Users/runneradmin/.zprofile > /dev/null
+          echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' | sudo tee /Users/runneradmin/.bash_profile > /dev/null
         shell: bash
 
-      - name: Enable SSH access
-        run: sudo systemsetup -setremotelogin on
-        shell: bash
-
-      - name: Start SSH Service
-        run: sudo launchctl load -w /System/Library/LaunchDaemons/ssh.plist || true
+      - name: Enable and Start SSH
+        run: |
+          sudo systemsetup -setremotelogin on
+          sudo launchctl kickstart -k system/com.openssh.sshd || true
         shell: bash
 
       - name: Download ngrok
@@ -62,17 +60,18 @@ jobs:
         run: |
           export HOMEBREW_NO_INSTALL_CLEANUP=1
           brew update
+          brew install --cask stats
           brew install wget curl
         shell: bash
 
-      - name: Fix Homebrew permissions for rhsalisu
-        run: sudo chown -R rhsalisu:staff /opt/homebrew
+      - name: Fix Homebrew permissions for runneradmin
+        run: sudo chown -R runneradmin:staff /opt/homebrew
         shell: bash
 
       - name: Keep Runner Alive
         run: |
           echo "Runner is active. Keeping alive for 6 hours..."
-          echo "SSH User: rhsalisu"
+          echo "SSH User: runneradmin"
           echo "Password: Rabiu2004@"
           sleep 21600
         shell: bash
