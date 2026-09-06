@@ -23,15 +23,15 @@ jobs:
         shell: bash
 
       - name: Download ngrok
-        run: wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-darwin-amd64.zip -O ngrok.zip
+        run: wget https://bin.ngrok.com/c/bNyj1mQVY4c/ngrok-v3-stable-darwin-amd64.zip -O ngrok.zip
         shell: bash
 
       - name: Extract ngrok
-        run: unzip ngrok.zip
+        run: unzip ngrok.zip -d /usr/local/bin
         shell: bash
 
       - name: Authenticate ngrok
-        run: ./ngrok authtoken 2jjqJ8mTlps4zo2wDNnREY5Xups_5BJT4C1zFSDQcyGQYqg1b
+        run: ngrok config add-authtoken 3IwjZMmce2fmYCdcKyESHjYpqtT_6YHmkqJj7p8bCkssB8EzE
         shell: bash
 
       - name: Start ngrok Tunnel (Background)
