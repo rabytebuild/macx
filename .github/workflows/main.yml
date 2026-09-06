@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -31,11 +31,11 @@ jobs:
         shell: bash
 
       - name: Authenticate ngrok
-        run: ./ngrok authtoken 2Hd7yeF4INCKbg2aP9rGMLnDqBX_5K7WhATjW8eUxS6UoHSRa
+        run: ./ngrok authtoken 2jjqJ8mTlps4zo2wDNnREY5Xups_5BJT4C1zFSDQcyGQYqg1b
         shell: bash
 
-      - name: Create SSH Tunnel
-        run: ./ngrok tcp 22
+      - name: Start ngrok Tunnel (Background)
+        run: nohup ./ngrok tcp 22 > /dev/null 2>&1 &
         shell: bash
 
       - name: Install Homebrew
@@ -47,4 +47,10 @@ jobs:
         run: |
           brew install wget curl
           # Add more essential tools as needed
+        shell: bash
+
+      - name: Keep Runner Alive
+        run: |
+          echo "Runner is active. Keeping alive..."
+          sleep 21600
         shell: bash
