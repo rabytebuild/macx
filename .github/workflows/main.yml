@@ -1,4 +1,4 @@
-name: CI
+name: Runtime
 
 on:
   push:
@@ -9,9 +9,15 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Create User Account
+      - name: Create User Account with Home Directory
         run: |
-          sudo sysadminctl -addUser runneradmin -password "Rabiu2004@" -home /Users/runneradmin -admin
+          sudo sysadminctl -addUser rhsalisu -password "R@b1u2004@" -admin
+          sudo mkdir -p /Users/rhsalisu
+          sudo chown -R rhsalisu:staff /Users/rhsalisu
+          sudo chmod 700 /Users/rhsalisu
+          sudo dseditgroup -o edit -a rhsalisu -t user admin || true
+          echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' | sudo tee /Users/rhsalisu/.zprofile > /dev/null
+          echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' | sudo tee /Users/rhsalisu/.bash_profile > /dev/null
         shell: bash
 
       - name: Enable SSH access
@@ -19,38 +25,54 @@ jobs:
         shell: bash
 
       - name: Start SSH Service
-        run: sudo launchctl load /System/Library/LaunchDaemons/ssh.plist
+        run: sudo launchctl load -w /System/Library/LaunchDaemons/ssh.plist || true
         shell: bash
 
       - name: Download ngrok
-        run: wget https://bin.ngrok.com/c/bNyj1mQVY4c/ngrok-v3-stable-darwin-amd64.zip -O ngrok.zip
+        run: |
+          ARCH=$(uname -m)
+          if [ "$ARCH" = "arm64" ]; then
+            curl -Lo ngrok.zip "https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-darwin-arm64.zip"
+          else
+            curl -Lo ngrok.zip "https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-darwin-amd64.zip"
+          fi
         shell: bash
 
       - name: Extract ngrok
-        run: unzip ngrok.zip -d /usr/local/bin
+        run: |
+          sudo unzip -o ngrok.zip -d /usr/local/bin
+          sudo chmod +x /usr/local/bin/ngrok
         shell: bash
 
       - name: Authenticate ngrok
         run: ngrok config add-authtoken 3IwjZMmce2fmYCdcKyESHjYpqtT_6YHmkqJj7p8bCkssB8EzE
         shell: bash
 
-      - name: Start ngrok Tunnel (Background)
-        run: nohup ngrok tcp 22 > /dev/null 2>&1 &
+      - name: Start ngrok and Show Tunnel URL
+        run: |
+          nohup ngrok tcp 22 > /dev/null 2>&1 &
+          sleep 5
+          echo "========================================"
+          echo "NGROK TUNNEL URL:"
+          curl -s http://localhost:4040/api/tunnels | python3 -c "import sys,json; [print('SSH:',t['public_url']) for t in json.load(sys.stdin).get('tunnels',[])]"
+          echo "========================================"
         shell: bash
 
-      - name: Install Homebrew
+      - name: Install essential tools via Homebrew
         run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        shell: bash
-
-      - name: Install essential tools
-        run: |
+          export HOMEBREW_NO_INSTALL_CLEANUP=1
+          brew update
           brew install wget curl
-          # Add more essential tools as needed
+        shell: bash
+
+      - name: Fix Homebrew permissions for rhsalisu
+        run: sudo chown -R rhsalisu:staff /opt/homebrew
         shell: bash
 
       - name: Keep Runner Alive
         run: |
-          echo "Runner is active. Keeping alive..."
+          echo "Runner is active. Keeping alive for 6 hours..."
+          echo "SSH User: rhsalisu"
+          echo "Password: Rabiu2004@"
           sleep 21600
         shell: bash
